@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Minimal Tech</title>
+    <style>
+        :root {
+            /* Minimalist Color Palette - Light Mode */
+            --bg-color: #fcfcfc;
+            --text-main: #1a1a1a;
+            --text-muted: #666666;
+            --accent: #2563eb;
+            --border: #eaeaea;
+            --shadow-hover: rgba(0, 0, 0, 0.08);
+            --dot-color: rgba(0, 0, 0, 0.05); /* Faint dots for light mode */
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+        }
+
+        /* Dark Mode Support (Applied via JS) */
+        [data-theme="dark"] {
+            --bg-color: #0f1115;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #60a5fa;
+            --border: #1e293b;
+            --shadow-hover: rgba(0, 0, 0, 0.4);
+            --dot-color: rgba(255, 255, 255, 0.03); /* Faint dots for dark mode */
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            position: relative;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- DYNAMIC WALLPAPER: MOVING DOT GRID --- */
+        .dynamic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+            background-size: 32px 32px;
+            animation: moveGrid 40s linear infinite;
+            transition: background-image 0.4s ease;
+        }
+
+        /* Fades the grid out at the edges so it doesn't look harsh */
+        .bg-vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-color) 100%);
+            pointer-events: none;
+            transition: background 0.4s ease;
+        }
+
+        @keyframes moveGrid {
+            0% { background-position: 0px 0px; }
+            100% { background-position: 32px 32px; }
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- STAGGERED FADE-IN ANIMATION --- */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.3s; }
+        .delay-3 { animation-delay: 0.5s; }
+        .delay-4 { animation-delay: 0.7s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- HEADER & TOGGLE --- */
+        header { 
+            margin-bottom: 4rem; 
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .header-text h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: -0.02em;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-muted);
+            transition: fill 0.3s ease, transform 0.3s ease;
+        }
+
+        .theme-toggle:hover svg {
+            fill: var(--accent);
+            transform: scale(1.1);
+        }
+
+        /* --- TERMINAL TYPING ANIMATION --- */
+        .tagline-container { display: inline-block; }
+
+        .tagline {
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid var(--accent);
+            width: 0;
+            animation: 
+                typing 2s steps(30, end) 0.5s forwards,
+                blink-caret 0.8s step-end infinite;
+        }
+
+        @keyframes typing { to { width: 100%; } }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--accent); }
+        }
+
+        section { margin-bottom: 4rem; }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.4s ease;
+        }
+
+        p { margin-bottom: 1.5rem; }
+
+        .project-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        /* --- PROJECT CARD HOVER ANIMATIONS --- */
+        .project {
+            position: relative;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--bg-color); /* solid background to prevent grid bleeding */
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease, border-color 0.4s ease;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* Subtle background gradient that fades in on hover */
+        .project::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, transparent 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Dark mode specific hover gradient */
+        [data-theme="dark"] .project::before { 
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.05) 0%, transparent 100%); 
+        }
+
+        .project:hover {
+            transform: translateY(-6px) scale(1.01);
+            border-color: var(--accent);
+            box-shadow: 0 12px 24px -10px var(--shadow-hover);
+        }
+
+        .project:hover::before { opacity: 1; }
+
+        .project h3 {
+            font-size: 1.1rem;
+            margin: 0 0 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .project:hover h3 { color: var(--accent); }
+
+        .project p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin: 0;
+            transition: color 0.4s ease;
+        }
+
+        .tech-stack {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-top: 1rem;
+            display: block;
+        }
+
+        /* --- SLIDING UNDERLINE LINK ANIMATION --- */
+        .links-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 1.5rem;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+        }
+
+        .links-list a {
+            color: var(--text-main);
+            text-decoration: none;
+            position: relative;
+            padding-bottom: 2px;
+            transition: color 0.3s ease;
+        }
+
+        .links-list a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            transform: scaleX(0);
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--accent);
+            transform-origin: bottom right;
+            transition: transform 0.3s cubic-bezier(0.86, 0, 0.07, 1);
+        }
+
+        .links-list a:hover { color: var(--accent); }
+        .links-list a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        footer {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 6rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            transition: border-color 0.4s ease, color 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dynamic Background Elements -->
+    <div class="dynamic-bg"></div>
+    <div class="bg-vignette"></div>
+
+    <div class="container">
+        <header class="fade-up delay-1">
+            <div class="header-text">
+                <h1>[Your Name]</h1>
+                <div class="tagline-container">
+                    <div class="tagline">~/nlp-and-machine-learning</div>
+                </div>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                <!-- Inline SVG Light Bulb Icon -->
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7zM9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1z"/>
+                </svg>
+            </button>
+        </header>
+
+        <section id="about" class="fade-up delay-2">
+            <h2>About</h2>
+            <p>
+                Hello. I am a student at SRMIST, Kattankulathur, with a deep interest in Natural Language Processing, Machine Learning, and statistical analysis. 
+            </p>
+            <p>
+                I focus on writing efficient, clean code and translating complex mathematical and theoretical concepts into functional technology. When I'm not studying foundational statistics or building ML pipelines, I appreciate minimal and abstract design.
+            </p>
+        </section>
+
+        <section id="projects" class="fade-up delay-3">
+            <h2>Projects</h2>
+            <div class="project-grid">
+                
+                <div class="project">
+                    <h3>POS Tagging Engine</h3>
+                    <p>A minimal and fast Part-of-Speech tagger built to demonstrate fundamental NLP techniques and statistical modeling for accurate text analysis.</p>
+                    <span class="tech-stack">[ Python, NLTK, Statistics ]</span>
+                </div>
+
+                <div class="project">
+                    <h3>ML Data Pipeline</h3>
+                    <p>An end-to-end data processing pipeline for evaluating machine learning data requirements, utilizing automated data cleaning and statistical transformations.</p>
+                    <span class="tech-stack">[ Pandas, Scikit-Learn, Math ]</span>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="contact" class="fade-up delay-4">
+            <h2>Connect</h2>
+            <ul class="links-list">
+                <li><a href="mailto:your.email@example.com">Email</a></li>
+                <li><a href="https://github.com/yourusername">GitHub</a></li>
+                <li><a href="https://linkedin.com/in/yourusername">LinkedIn</a></li>
+            </ul>
+        </section>
+
+        <footer class="fade-up delay-4">
+            &copy; 2026 [Your Name]. Keep it clean.
+        </footer>
+    </div>
+
+    <!-- Theme Toggle Logic -->
+    <script>
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const rootElement = document.documentElement;
+        
+        // Check for saved theme in localStorage
+        const savedTheme = localStorage.getItem('theme');
+        
+        // Check system preference
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // Apply initial theme
+        if (savedTheme) {
+            rootElement.setAttribute('data-theme', savedTheme);
+        } else if (systemPrefersDark) {
+            rootElement.setAttribute('data-theme', 'dark');
+        } else {
+            // Default to light if no storage and no preference
+            rootElement.setAttribute('data-theme', 'light');
+        }
+
+        // Toggle event listener
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = rootElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            // Update HTML attribute
+            rootElement.setAttribute('data-theme', newTheme);
+            // Save preference to localStorage
+            localStorage.setItem('theme', newTheme);
+        });
+    </script>
+</body>
+</html>
