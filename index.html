@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nvaneeth S | Portfolio</title>
+    <title>Navaneeth S | Portfolio</title>
     <style>
         :root {
             /* Minimalist Color Palette - Light Mode */
@@ -15,11 +15,11 @@
             --shadow-hover: rgba(0, 0, 0, 0.08);
             --dot-color: rgba(0, 0, 0, 0.05);
             --orb-opacity: 0.08;
-
+            
             /* Initial cursor position variables */
             --mouse-x: 50vw;
             --mouse-y: 50vh;
-
+            
             /* Typography */
             --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
@@ -78,8 +78,8 @@
             z-index: -3;
             /* Follows mouse coordinates set by JS */
             transform: translate(calc(var(--mouse-x) - 50%), calc(var(--mouse-y) - 50%));
-            pointer-events: none; /* Ensures the orb doesn't block you from clicking links */
-            transition: opacity 0.4s ease, background 0.4s ease, transform 0.15s ease-out; /* smooth trailing effect */
+            pointer-events: none; 
+            transition: opacity 0.4s ease, background 0.4s ease, transform 0.15s ease-out; 
             will-change: transform;
         }
 
@@ -113,7 +113,7 @@
             transform: translateY(20px);
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-
+        
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
@@ -127,11 +127,13 @@
         }
 
         /* --- HEADER & TOGGLE --- */
-        header {
-            margin-bottom: 4rem;
+        header { 
+            margin-bottom: 4rem; 
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            z-index: 10; /* Ensures header is above all background effects */
         }
 
         h1 {
@@ -145,10 +147,15 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 0;
+            padding: 16px; /* Extra large hit area */
+            margin: -16px; 
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: manipulation; 
+            position: relative;
+            z-index: 20; /* Highest priority for clicks */
         }
 
         .theme-toggle svg {
@@ -156,14 +163,16 @@
             height: 24px;
             fill: var(--text-muted);
             transition: fill 0.3s ease, transform 0.3s ease;
+            pointer-events: none; 
         }
 
-        .theme-toggle:hover svg {
+        .theme-toggle:hover svg,
+        .theme-toggle:active svg { 
             fill: var(--accent);
             transform: scale(1.1);
         }
 
-        section { margin-bottom: 4rem; }
+        section { margin-bottom: 4rem; position: relative; z-index: 5; }
 
         h2 {
             font-size: 1.25rem;
@@ -203,8 +212,8 @@
             transition: opacity 0.4s ease;
         }
 
-        [data-theme="dark"] .project::before {
-            background: linear-gradient(135deg, rgba(96, 165, 250, 0.05) 0%, transparent 100%);
+        [data-theme="dark"] .project::before { 
+            background: linear-gradient(135deg, rgba(96, 165, 250, 0.05) 0%, transparent 100%); 
         }
 
         .project:hover {
@@ -284,6 +293,8 @@
             padding-top: 2rem;
             border-bottom: 1px solid var(--border);
             transition: border-color 0.4s ease, color 0.4s ease;
+            position: relative;
+            z-index: 5;
         }
     </style>
 </head>
@@ -306,7 +317,7 @@
         <section id="about" class="fade-up delay-2">
             <h2>About</h2>
             <p>
-                Hello. I am a student at SRMIST, Kattankulathur, with a deep interest in Natural Language Processing, Machine Learning, and statistical analysis.
+                Hello. I am a student at SRMIST, Kattankulathur, with a deep interest in Natural Language Processing, Machine Learning, and statistical analysis. 
             </p>
             <p>
                 I focus on writing efficient, clean code and translating complex mathematical and theoretical concepts into functional technology. When I'm not studying foundational statistics or building ML pipelines, I appreciate minimal and abstract design.
@@ -316,7 +327,7 @@
         <section id="projects" class="fade-up delay-3">
             <h2>Projects</h2>
             <div class="project-grid">
-
+                
                 <div class="project">
                     <h3>POS Tagging Engine</h3>
                     <p>A minimal and fast Part-of-Speech tagger built to demonstrate fundamental NLP techniques and statistical modeling for accurate text analysis.</p>
@@ -335,24 +346,34 @@
         <section id="contact" class="fade-up delay-4">
             <h2>Connect</h2>
             <ul class="links-list">
-                <li><a href="mailto:the.navaneeeth@gmail.com">Email</a></li>
-                <li><a href="https://github.com/nvnth"target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                <li><a href="https://linkedin.com/in/navaneeth-santhosh"target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+                <li><a href="mailto:your.email@example.com">Email</a></li>
+                <li><a href="https://github.com/yourusername">GitHub</a></li>
+                <li><a href="https://linkedin.com/in/yourusername">LinkedIn</a></li>
             </ul>
         </section>
 
         <footer class="fade-up delay-4">
-            &copy; 2026 Nvaneeth S. Keep it clean.
+            &copy; 2026 Navaneeth S. Keep it clean.
         </footer>
     </div>
 
     <!-- Interactive Logic -->
     <script>
         const rootElement = document.documentElement;
-
-        // --- Theme Toggle Logic ---
         const themeToggleBtn = document.getElementById('themeToggle');
-        const savedTheme = localStorage.getItem('theme');
+        
+        // Safe Storage Wrappers (Prevents Brave mobile from crashing the script)
+        function getSavedTheme() {
+            try { return localStorage.getItem('theme'); } 
+            catch (e) { return null; }
+        }
+        function saveTheme(theme) {
+            try { localStorage.setItem('theme', theme); } 
+            catch (e) { /* Ignore storage error, theme will still change visually */ }
+        }
+
+        // Apply Initial Theme
+        const savedTheme = getSavedTheme();
         const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
         if (savedTheme) {
@@ -363,20 +384,27 @@
             rootElement.setAttribute('data-theme', 'light');
         }
 
+        // Toggle Event Listener
         themeToggleBtn.addEventListener('click', () => {
             const currentTheme = rootElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
+            
             rootElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            saveTheme(newTheme);
         });
 
         // --- Cursor Tracking Logic ---
         document.addEventListener('mousemove', (e) => {
-            // Update CSS variables with current mouse position
             rootElement.style.setProperty('--mouse-x', `${e.clientX}px`);
             rootElement.style.setProperty('--mouse-y', `${e.clientY}px`);
         });
+
+        document.addEventListener('touchstart', (e) => {
+            if(e.touches.length > 0) {
+                rootElement.style.setProperty('--mouse-x', `${e.touches[0].clientX}px`);
+                rootElement.style.setProperty('--mouse-y', `${e.touches[0].clientY}px`);
+            }
+        }, {passive: true});
     </script>
 </body>
 </html>
